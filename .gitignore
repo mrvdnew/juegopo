@@ -1,129 +1,80 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
+import pygame, random
+WIDTH = 1080
+HEIGHT = 720
+BLACK = (0,0,0)
+WHITE = (255,255,255)
+pygame.init()
+pygame.mixer.init()
+screen = pygame.display.set_mode((WIDTH,HEIGHT))
+clock = pygame.time.Clock()
 
-# C extensions
-*.so
 
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-pip-wheel-metadata/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+def draw_text(surface, text, size, x, y):
+    font = pygame.font.SysFont("serif", size)
+    text_surface = font.render(text, True, WHITE)
+    text_rect = text_surface.get_rect()
+    text_rect.midtop = (x, y)
+    surface.blit(text_surface, text_rect)
 
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
+class Coin(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.image.load("coin.png").convert()
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.image.load("player.png").convert()
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+pygame.init()
 
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
+screen = pygame.display.set_mode((1080, 720))
+clock = pygame.time.Clock()
+done = False
+score = 0
+coin_list = pygame.sprite.Group()
+all_sprite_list = pygame.sprite.Group()
 
-# Translations
-*.mo
-*.pot
+for i in range(50):
+    coin = Coin()
+    coin.rect.x = random.randrange(1080)
+    coin.rect.y = random.randrange(720)
 
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
+    coin_list.add(coin)
+    all_sprite_list.add(coin)
 
-# Flask stuff:
-instance/
-.webassets-cache
+fondo = pygame.image.load("galaxia.png").convert()
+x = 0
 
-# Scrapy stuff:
-.scrapy
+player = Player()
+all_sprite_list.add(player)
 
-# Sphinx documentation
-docs/_build/
+while not done:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            done = True
 
-# PyBuilder
-target/
+    screen.blit(fondo, (x, 0))
+    x = 1
+    mouse_pos = pygame.mouse.get_pos()
+    player.rect.x = mouse_pos[0]
+    player.rect.y = mouse_pos[1]
 
-# Jupyter Notebook
-.ipynb_checkpoints
+    coin_hit_list = pygame.sprite.spritecollide(player, coin_list, True)
 
-# IPython
-profile_default/
-ipython_config.py
+    for coin in coin_hit_list:
+        score += 10
+        print(score)
 
-# pyenv
-.python-version
 
-# pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   having no cross-platform support, pipenv may install dependencies that don't work, or not
-#   install all needed dependencies.
-#Pipfile.lock
+    all_sprite_list.draw(screen)
 
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow
-__pypackages__/
+    draw_text(screen, str(score), 25, WIDTH // 2, 10)
 
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
+    pygame.display.flip()
+    clock.tick(60)
 
-# SageMath parsed files
-*.sage.py
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre type checker
-.pyre/
+pygame.quit()
